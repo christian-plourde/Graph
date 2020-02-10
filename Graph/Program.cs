@@ -6,17 +6,22 @@ using System.Threading.Tasks;
 
 namespace Graph
 {
-    public class G
+    public class G : IHeuristic<G>
     {
-        public int i;
-        public G(int i)
+        public string name;
+        public G(string name)
         {
-            this.i = i;
+            this.name = name;
         }
 
         public override string ToString()
         {
-            return i.ToString();
+            return name.ToString();
+        }
+
+        public double ComputeHeuristic(G goal)
+        {
+            return 5;
         }
     }
 
@@ -24,34 +29,41 @@ namespace Graph
     {
         static void Main(string[] args)
         {
-            Graph<G> graph = new Graph<G>();
+            PathFinderGraph<G> graph = new PathFinderGraph<G>();
+            //Graph<G> graph = new Graph<G>();
 
-            GraphNode<G> n1 = new GraphNode<G>(new G(5));
-            GraphNode<G> n2 = new GraphNode<G>(new G(7));
-            GraphNode<G> n3 = new GraphNode<G>(new G(8));
-            GraphNode<G> n4 = new GraphNode<G>(new G(9));
-            GraphNode<G> n5 = new GraphNode<G>(new G(6));
-            GraphNode<G> n6 = new GraphNode<G>(new G(4));
+            GraphNode<G> ns = new GraphNode<G>(new G("S"));
+            GraphNode<G> na = new GraphNode<G>(new G("A"));
+            GraphNode<G> nb = new GraphNode<G>(new G("B"));
+            GraphNode<G> nc = new GraphNode<G>(new G("C"));
+            GraphNode<G> nd = new GraphNode<G>(new G("D"));
+            GraphNode<G> ne = new GraphNode<G>(new G("E"));
+            GraphNode<G> ng = new GraphNode<G>(new G("G"));
             
-            graph.Add(n1);
-            graph.Add(n2);
-            graph.Add(n3);
-            graph.Add(n4);
-            graph.Add(n5);
-            graph.Add(n6);
+            graph.Add(ns);
+            graph.Add(na);
+            graph.Add(nb);
+            graph.Add(nc);
+            graph.Add(nd);
+            graph.Add(ne);
+            graph.Add(ng);
 
-            n1.AddNeighbor(n2, 5);
-            n2.AddNeighbor(n4, 1);
-            n2.AddNeighbor(n3, 7);
-            n3.AddNeighbor(n4, 7);
-            n3.AddNeighbor(n5, 3);
-            n3.AddNeighbor(n6, 6);
-            n4.AddNeighbor(n3, 4);
-            n4.AddNeighbor(n6, 3);
+            ns.AddNeighbor(na, 3);
+            ns.AddNeighbor(nb, 10);
+            na.AddNeighbor(nb, 5);
+            na.AddNeighbor(nc, 9);
+            na.AddNeighbor(nd, 6);
+            nb.AddNeighbor(nc, 3);
+            nb.AddNeighbor(ng, 15);
+            nc.AddNeighbor(nd, 9);
+            nc.AddNeighbor(ne, 7);
+            nc.AddNeighbor(ng, 6);
+            nd.AddNeighbor(ne, 6);
+            ne.AddNeighbor(ng, 3);
 
             Console.WriteLine(graph);
 
-            LinkedList<GraphNode<G>> path = graph.DijkstraShortestPath(n1, n3);
+            LinkedList<GraphNode<G>> path = graph.ShortestPath(ns, ng);
 
             string s = string.Empty;
             int i = 0;
