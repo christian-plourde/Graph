@@ -318,7 +318,7 @@ namespace Graph
                 if (e.Start.CostSoFar + e.Cost < e.End.CostSoFar)
                 {
                     e.End.CostSoFar = e.Start.CostSoFar + e.Cost;
-                    e.End.EstimatedTotalCost = e.End.Heuristic + e.End.CostSoFar;
+                    e.End.EstimatedTotalCost = e.End.Heuristic + e.Start.CostSoFar;
                     e.End.Connection = e;
                     cost_changed = true;
                 }
