@@ -90,7 +90,7 @@ namespace Graph
         {
             this.edges.AddLast(new GraphEdge<T>(this, n, cost));
         }
-        
+
         public T Value
         {
             get { return value; }
@@ -110,7 +110,7 @@ namespace Graph
             string s = value.ToString() + " -> ";
 
             int i = 0;
-            foreach(GraphEdge<T> e in edges)
+            foreach (GraphEdge<T> e in edges)
             {
                 if (i == edges.Count - 1)
                     s += e.End.Value.ToString();
@@ -132,6 +132,11 @@ namespace Graph
         protected LinkedList<GraphNode<T>> open_nodes;
         protected LinkedList<GraphNode<T>> closed_nodes;
         protected GraphNode<T> current_node;
+
+        public LinkedList<GraphNode<T>> Nodes
+        {
+            get { return nodes; }
+        }
 
         protected GraphNode<T> StartNode
         {
@@ -169,16 +174,25 @@ namespace Graph
             nodes.AddLast(node);
         }
 
+        protected void resetCosts()
+        {
+            foreach (GraphNode<T> n in nodes)
+                n.CostSoFar = double.MaxValue;
+        }
+
         public virtual LinkedList<GraphNode<T>> ShortestPath(GraphNode<T> start_node, GraphNode<T> end_node)
         {
+            open_nodes.Clear();
+            closed_nodes.Clear();
             this.StartNode = start_node;
+            resetCosts();
             start_node.CostSoFar = 0;
             DijkstraEvaluate();
 
             GraphNode<T> curr = end_node;
             LinkedList<GraphNode<T>> node_order = new LinkedList<GraphNode<T>>();
 
-            while(curr != start_node)
+            while (curr != start_node)
             {
                 node_order.AddFirst(curr);
                 curr = curr.Connection.Start;
@@ -195,10 +209,10 @@ namespace Graph
             current_node = start_node;
             open_nodes.AddLast(current_node);
 
-            while(open_nodes.Count > 0)
+            while (open_nodes.Count > 0)
             {
                 DijkstraEvaluateNeighbors();
-                if(open_nodes.Count > 0)
+                if (open_nodes.Count > 0)
                     current_node = getSmallestCostSoFar();
             }
 
@@ -207,12 +221,12 @@ namespace Graph
         private void DijkstraEvaluateNeighbors()
         {
             //we look at each of the neighbors of the current node and update their costs so far and connection values
-            foreach(GraphEdge<T> e in current_node.Links)
+            foreach (GraphEdge<T> e in current_node.Links)
             {
                 bool cost_changed = false;
                 //for each edge if the cost so far of the start + the cost of the edge we are on is less than the end
                 //current cost so far we should update its connection and its cost so far
-                if(e.Start.CostSoFar + e.Cost < e.End.CostSoFar)
+                if (e.Start.CostSoFar + e.Cost < e.End.CostSoFar)
                 {
                     e.End.CostSoFar = e.Start.CostSoFar + e.Cost;
                     e.End.Connection = e;
@@ -220,19 +234,19 @@ namespace Graph
                 }
 
                 //add the end node to the open list
-                if(!open_nodes.Contains(e.End) && cost_changed)
+                if (!open_nodes.Contains(e.End) && cost_changed)
                     open_nodes.AddLast(e.End);
             }
 
             open_nodes.Remove(current_node);
             closed_nodes.AddLast(current_node);
-            
+
         }
 
         public override string ToString()
         {
             string s = string.Empty;
-            foreach(GraphNode<T> node in nodes)
+            foreach (GraphNode<T> node in nodes)
             {
                 s += node.ToString() + "\n";
             }
@@ -268,10 +282,13 @@ namespace Graph
 
         public override LinkedList<GraphNode<T>> ShortestPath(GraphNode<T> start_node, GraphNode<T> end_node)
         {
+            open_nodes.Clear();
+            closed_nodes.Clear();
             this.StartNode = start_node;
+            resetCosts();
             start_node.CostSoFar = 0;
 
-            foreach(GraphNode<T> n in nodes)
+            foreach (GraphNode<T> n in nodes)
             {
                 n.Heuristic = n.Value.ComputeHeuristic(end_node.Value);
             }
